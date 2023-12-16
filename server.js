@@ -1,6 +1,7 @@
 const express = require('express')
 const { APP_PORT } = require('./api/utils/constants')
 const userRoutes = require('./api/routes/user.route')
+const db = require('./api/utils/db');
 const app = express()
 
 app.use((req, res, next) => {
