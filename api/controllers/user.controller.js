@@ -69,8 +69,11 @@ module.exports.loginUser = async (req, res) => {
       console.log(passwordMatch);
       if (passwordMatch) {
         // Generate and send a JWT token upon successful login
+        console.log(result);
+        console.log(result[0]);
+        console.log(result[0].userId);
         const token = jwt.sign(
-          { userId: result[0].id, username: result[0].username },
+          { userId: result[0].userId, username: result[0].username },
           JWT_SECRET,
           { expiresIn: "1h" }
         );
@@ -86,5 +89,27 @@ module.exports.loginUser = async (req, res) => {
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).send("Login failed");
+  }
+};
+
+module.exports.addMachineCodeOfUser = async (req, res) => {
+  const machineCode = req.body.machineCode;
+  const userId = req.userId;
+
+  console.log(machineCode);
+  console.log(userId);
+  try {
+    const result = await (
+      await connection
+    ).execute("update `users` set machineCode = ? where userId = ?", [
+      machineCode,
+      userId,
+    ]);
+
+    console.log("Machine Code Added successfully", result);
+    res.status(200).send("Machine Code Added successfully");
+  } catch (error) {
+    console.error("Error while adding Machine Code : ", error);
+    res.status(500).send("Unable to add Machine Code");
   }
 };
