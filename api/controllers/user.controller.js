@@ -27,7 +27,6 @@ module.exports.registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    // Insert the new user into the database
     const result = await (
       await connection
     ).execute(
@@ -47,50 +46,36 @@ module.exports.loginUser = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const [rows] = await (
+    const [userData] = await (
       await connection
     ).execute("SELECT * FROM `users` WHERE `username` = ?", [username]);
 
-    const [dbPassword] = await (
-      await connection
-    ).execute("SELECT password FROM `users` WHERE `username` = ?", [username]);
-
-    const result = rows;
-
-    console.log(rows);
-    console.log(result);
-    console.log(dbPassword);
-    if (result.length > 0) {
-      // Compare the entered password with the hashed password from the database
-      const passwordMatch = await bcrypt.compare(
-        password,
-        dbPassword[0].password
-      );
-      console.log(passwordMatch);
-      if (passwordMatch) {
-        // Generate and send a JWT token upon successful login
-        console.log(result);
-        console.log(result[0]);
-        console.log(result[0].userId);
-        const token = jwt.sign(
-          { userId: result[0].userId, username: result[0].username },
-          JWT_SECRET,
-          { expiresIn: "1h" }
-        );
-        res.status(200).json({ token });
-      } else {
-        console.log("Invalid password");
-        res.status(401).send("Invalid password");
-      }
-    } else {
+    if (userData.length === 0) {
       console.log("User not found");
-      res.status(404).send("User not found");
+      return res.status(404).send("User not found");
+    }
+
+    const userId = userData[0].userId;
+    const dbPassword = userData[0].password;
+
+    const passwordMatch = await bcrypt.compare(password, dbPassword);
+
+    if (passwordMatch) {
+      const token = generateToken({ userId, username });
+      res.status(200).json({ token });
+    } else {
+      console.log("Invalid credentials");
+      res.status(401).send("Invalid credentials");
     }
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).send("Login failed");
   }
 };
+
+function generateToken(payload) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+}
 
 module.exports.addMachineCodeOfUser = async (req, res) => {
   const machineCode = req.body.machineCode;
