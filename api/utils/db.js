@@ -6,7 +6,7 @@ const connection = mysql.createConnection({
   port: DB_PORT,
   user: DB_USER,
   password: DB_PASS,
-  database: "hpprojectpractice",
+  database: DB_NAME
 });
 
 module.exports = connection;

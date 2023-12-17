@@ -1,6 +1,7 @@
 const express = require("express");
 const { APP_PORT } = require("./api/utils/constants");
 const userRoutes = require("./api/routes/user.route");
+const scheduleRoutes = require("./api/routes/schedule.route");
 const db = require("./api/utils/db");
 const app = express();
 const bodyParser = require("body-parser");
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", userRoutes);
+app.use("/schedule", scheduleRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");

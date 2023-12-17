@@ -6,4 +6,4 @@ exports.DB_PORT = process.env.DB_PORT,
 exports.DB_USER = process.env.DB_USER,
 exports.DB_PASS = process.env.DB_PASS,
 exports.DB_NAME = process.env.DB_NAME,
-    exports.JWT_SECRET = process.env.JWT_SECRET
+exports.JWT_SECRET = process.env.JWT_SECRET
